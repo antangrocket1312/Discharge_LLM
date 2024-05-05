@@ -32,7 +32,7 @@ conda install pytorch::pytorch torchvision torchaudio -c pytorch
 For other versions, please visit: [https://pytorch.org/get-started/locally/](https://pytorch.org/get-started/locally/)
 
 ## Framework
-![Model architecture](Discharge_LLM_Diagram.png)
+![Model architecture](./Discharge_LLM_Diagram.png)
 We propose a pipeline framework, namely Discharge-LLM for the Discharge Summary Documentation task, which generates the two critical 'Brief Hospital Course' and 'Discharge Instructions' sections in the discharge summary. 
 
 # More code to release soon.
