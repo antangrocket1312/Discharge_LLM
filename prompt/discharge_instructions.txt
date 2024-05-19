@@ -1,0 +1,33 @@
+<s>[INST] In this task, you are provided with a Discharge Summary delimited by triple quotes.
+Discharge Summaries are documents that outline the care a patient received during their hospital stay, including diagnoses, treatments, and follow-up care instructions, prepared at the time of a patient's discharge.
+Discharge Summaries are split into various sections and written under a variety of headings, relating to admission, diagnosis and relevant discharge information. But the provided Discharge summary will be missing the \"Discharge Instructions\". \"Discharge Instructions\" is a section of the discharge summaries that summarizes key events of a patient's hospital stay, including the progression from admission to discharge. and provide detailed guidelines to patients (and often their caregivers) upon discharge from a hospital or healthcare facility, outlining how to care for themselves at home.
+You are tasked to generate the missing \"Discharge Instructions\" section in the discharge summary, based on the information of other sections in the discharge summary.
+Discharge Instructions summarizes key events of a patient's hospital stay, including the progression from admission to discharge. and provide detailed guidelines to patients (and often their caregivers) upon discharge from a hospital or healthcare facility, outlining how to care for themselves at home.
+
+The summary should be written in the following structure, by answering some important questions in paragraphs:
+1. Introduction: A brief, personalized opening in one sentence acknowledging the patient's stay and expressing gratitude for allowing the healthcare team to provide care.
+2. Admission Reason: A concise explanation of:
+    * Why the patient was admitted, including any specific conditions or symptoms addressed during the stay.
+    * What was the patient's diagnosis upon admission to the hospital?
+3. Hospital Course: A concise summary of what happened to the patient's at the hospital
+    * What are the conditions, symptoms and how were the diagnosis reached, including any significant tests or evaluations conducted (e.g., CT Scan, Imaging, Blood Test, MRI)?
+    * For each condition or symptom, what was the treatment strategy, including any medications given, procedures performed, or change in medication?
+    * How did the patient respond to the treatment and procedures? Did the patient make any specific requests regarding their care, such as refusing a treatment or requesting a transfer? How were these handled?
+    * Were there any complications or notable improvements in the patient's condition during the stay?
+    * What were the outcomes of the treatments or interventions provided?
+4. Post-Discharge Instructions:
+    + Follow-Up Care:
+        * What the patient should do after leaving the hospital?
+        * What specific activity restrictions or recommendations are given to ensure a smooth recovery? (e.g., weight lifting limits, mobility advice)
+        * Are there any restrictions on driving or operating machinery, especially if the patient is taking new or continued pain medication?
+        * Instructions on how to continue treatments started in the hospital, such as new medications or therapy.
+    + Medications (Optional):
+        * Comprehensive instructions for all prescribed medications, including dosage, timing, and any specific instructions for use.
+        * How should the patient manage their regular home medications in addition to any new medications prescribed at discharge?
+    + Monitoring:
+        * Guidelines on any self-monitoring the patient should perform at home, such as weighing themselves, monitoring blood pressure, or blood sugar levels, with instructions on when to contact their healthcare provider.
+        * Are there any specific symptoms or signs that the patient should monitor for which would require immediate medical attention? Under what circumstances should the patient immediately contact their healthcare provider or seek emergency care?
+6. Closing Remarks: A closing statement wishing the patient well and reinforcing the availability of the healthcare team for any questions or concerns post-discharge.
+
+Discharge summary:
+\"\"\"%s\"\"\" [/INST]

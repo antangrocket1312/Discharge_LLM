@@ -31,6 +31,12 @@ conda install pytorch::pytorch torchvision torchaudio -c pytorch
 ```
 For other versions, please visit: [https://pytorch.org/get-started/locally/](https://pytorch.org/get-started/locally/)
 
+### 3. Additional packages
+We need some additional packages to run the code. The list of packages is listed in ```requirements.txt```. On the main directory of the repository, run:
+```bash
+pip install -r requirements.txt
+```
+
 ## Framework
 ![Model architecture](Discharge_LLM_Diagram.png)
 We propose a pipeline framework, namely Discharge-LLM for the Discharge Summary Documentation task, which generates the two critical 'Brief Hospital Course' and 'Discharge Instructions' sections in the discharge summary. 
@@ -42,6 +48,15 @@ Discharge-LLM applies three steps for generating Brief Hospital Course and Disch
 - **Stage 3: Target Section Generation**
 
 ## Inference
+```
+notebook
+├── brief_hospital_course_generation.ipynb
+├── discharge_instructions_generation.ipynb
+script
+├── section_extraction.py
+├── radiology_report_selection.py
+├── target_section_generation.py
+```
 ### Hosting an instruction-finetuned Mistral LLM for Target Section Generation
 We used [FastChat](https://github.com/lm-sys/FastChat/tree/main) to host a Mistral LLMs for prompted generation of the two critical target sections of discharge summaries.
 FastChat provides OpenAI-compatible APIs for its supported models, so you can use FastChat as a local drop-in replacement for OpenAI APIs.
@@ -91,4 +106,24 @@ Finally, launch the RESTful API server
 python3 -m fastchat.serve.openai_api_server --host localhost --port 8000
 ```
 
-# More code to release soon.
+### Stage 1: Section Extraction
+```bash
+python scripts/section_extraction.py \ 
+    --discharge_summary_path raw/phase_2/discharge.csv.gz \
+    --output_file_name raw/phase_2/discharge_extracted.csv.gz
+```
+
+### Stage 2: Radiology Report Selection
+```bash
+python scripts/section_extraction.py \ 
+    --extracted_discharge_summary_path raw/phase_2/discharge_extracted.csv.gz
+    --radiology_report raw/phase_2/radiology.csv.gz
+    --output_file_name raw/phase_2/discharge_processed.csv.gz
+```
+
+### Stage 3: Target Section Generation
+```bash
+python scripts/section_extraction.py \ 
+    --processed_discharge_summary_path raw/phase_2/discharge_processed.csv.gz
+    --output_file_name raw/phase_2/discharge_target_generated.csv.gz
+```
