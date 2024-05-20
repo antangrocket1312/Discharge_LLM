@@ -48,7 +48,18 @@ Discharge-LLM applies three steps for generating Brief Hospital Course and Disch
 - **Stage 3: Target Section Generation**
 
 ## Inference
+We offer two options to perform inference of our pipeline framework (PAKPA), using Jupyter Notebook files (```notebook```) or Python inference scripts (```script```).
+Each file in the (```notebook```) folder can be used for generation of each target section.
+Each file in the (```script```) folder invokes each stage in our pipeline.
+Below is the repository structures:
 ```
+data
+├── test_phase_2
+│   ├── discharge.csv.gz
+│   ├── radiology.csv.gz
+├── sample
+│   ├── discharge.csv.gz
+│   ├── radiology.csv.gz
 notebook
 ├── brief_hospital_course_generation.ipynb
 ├── discharge_instructions_generation.ipynb
@@ -57,6 +68,13 @@ script
 ├── radiology_report_selection.py
 ├── target_section_generation.py
 ```
+
+**Note:** *We provide full examples for inference on phase 2's test set (10962 samples) of the shared task (```data/test_phase_2```), but the runtime can be extremely long (3 days using GPU). 
+For runtime feasibility, we advised doing inference data from (```data/sample```), a subset of the phase 2's test set.
+Users can test the framework on their custom data, but the discharge summary and radiology information 
+must follow the exact schema and naming as defined in ```discharge.csv.gz``` and ```radiology.csv.gz```*
+
+
 ### Hosting an instruction-finetuned Mistral LLM for Target Section Generation
 We used [FastChat](https://github.com/lm-sys/FastChat/tree/main) to host a Mistral LLMs for prompted generation of the two critical target sections of discharge summaries.
 FastChat provides OpenAI-compatible APIs for its supported models, so you can use FastChat as a local drop-in replacement for OpenAI APIs.
