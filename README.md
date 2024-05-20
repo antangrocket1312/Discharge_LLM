@@ -80,7 +80,7 @@ We used [FastChat](https://github.com/lm-sys/FastChat/tree/main) to host a Mistr
 FastChat provides OpenAI-compatible APIs for its supported models, so you can use FastChat as a local drop-in replacement for OpenAI APIs.
 The FastChat server is compatible with both [openai-python](https://github.com/openai/openai-python) library and cURL commands.
 
-**Note:** *Mistrial-7B-Instruct-v0.2 is used as the LLMs for the generation tasks. This model requires around 6GB of GPU memory.
+**Note:** *Mistrial-7B-Instruct-v0.2 is used as the LLMs for the generation tasks. This model requires around 12GB of GPU memory.
 For more information to reduce memory requirement or instruction to run on other architectures, please refer to [link](https://github.com/lm-sys/FastChat/tree/main?tab=readme-ov-file#inference-with-command-line-interface)*
 
 First, launch the controller
