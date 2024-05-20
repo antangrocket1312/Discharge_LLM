@@ -78,11 +78,12 @@ script
 ├── target_section_generation.py
 ```
 
-**Note:** *We provide full examples for inference on phase 2's test set (10962 samples) of the shared task (```data/test_phase_2```), but the runtime can be extremely long (3 days using GPU). 
-For runtime feasibility, we advised doing inference data from (```data/sample```), a subset of the phase 2's test set.
-Users can test the framework on their custom data, but the discharge summary and radiology information 
-must follow the exact schema and naming as defined in ```discharge.csv.gz``` and ```radiology.csv.gz```*
+**Note:** *We provide full examples for inference on phase 2's test set (10962 samples) of the shared task (```data/test_phase_2```), but the runtime can be extremely long (6-7 days using GPU).
+For your convenience, we already completed the inference and provided the inference results as ```brief_hospital_course.csv``` and ```discharge_instructions.csv``` under (```data/test_phase_2```)*
 
+For runtime feasibility, we advised you can perform inference using data from (```data/sample```), a subset with 10 samples from the phase 2's test set.
+You can also test the framework on their custom data, 
+with the discharge summary and radiology information following the exact schema and naming as defined in ```discharge.csv.gz``` and ```radiology.csv.gz```
 
 ### Hosting an instruction-finetuned Mistral LLM for Target Section Generation
 We used [FastChat](https://github.com/lm-sys/FastChat/tree/main) to host a Mistral LLMs for prompted generation of the two critical target sections of discharge summaries.

@@ -1,0 +1,22 @@
+In this task, you are provided with a Discharge Summary delimited by triple quotes.
+Discharge Summaries are documents that outline the care a patient received during their hospital stay, including diagnoses, treatments, and follow-up care instructions, prepared at the time of a patient's discharge.
+Discharge Summaries are split into various sections and written under a variety of headings, relating to admission, diagnosis and relevant discharge information. But the provided Discharge summary will be missing the \"Brief Hospital Course\". \"Brief Hospital Course\" is a section of the discharge summaries that outlines the key events of a patient's hospital stay, including the progression from admission to discharge. It is written for the subsequent care providers about the critical aspects of the patient.
+You are tasked to generate the missing \"Brief Hospital Course\" section in the discharge summary, based on the information of other sections in the discharge summary.
+Brief Hospital Course outlines the key events of a patient's hospital stay, including the progression from admission to discharge. It is written for the subsequent care providers about the critical aspects of the patient
+
+The summary should be written in the following structure, by answering some important questions:
+1. Initial presentation: Describe the patient's initial presentation, including the main complaint and relevant history.
+    * What were the main treatment strategies employed for the patient's conditions during their stay? Include medications adjusted, procedures performed, and any therapeutic interventions.
+    * What are the key diagnoses identified during the hospital stay?
+2. Treatment course:
+    - For each section header named by "#Condition Name", provide a detailed description of each condition, disease, or symptom of the patient by answering the following questions:
+        * What is the patient's background relating to the condition, disease, or symptom
+        * Describe the treatment strategy, including any medications given, procedures performed, and dietary adjustments.
+        * How was the diagnosis reached, including any significant tests or evaluations conducted?
+        * What were the significant medical or surgical interventions during the hospital stay, including any procedures, diagnostic tests (e.g., CT Scan, Imaging, Blood Test, MRI), and changes in medication?
+        * Were there any complications or additional diagnoses during the hospital stay? How were these addressed and managed?
+        * How did the patient's condition progress throughout the hospital stay, including any monitoring of symptoms, response to treatments, and adjustments made to the treatment plan?
+        * What were the conditions and considerations for the patient’s discharge? Include the discharge medications, any changes from previous medication regimens, and follow-up care or lifestyle recommendations.
+3. Transitional issues: Highlight any transitional care issues addressed during the hospital stay, including changes in medication, dietary adjustments, and specific care instructions.
+4. Acute/active issues: Detail the management of acute or active issues encountered during the stay, using the provided structure for each condition.
+5. Chronic/stable issues: Summarize how chronic conditions were managed during the stay and any adjustments made to long-term management plans.

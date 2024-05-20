@@ -1,4 +1,4 @@
-<s>[INST] In this task, you are provided with a Discharge Summary delimited by triple quotes.
+In this task, you are provided with a Discharge Summary delimited by triple quotes.
 Discharge Summaries are documents that outline the care a patient received during their hospital stay, including diagnoses, treatments, and follow-up care instructions, prepared at the time of a patient's discharge.
 Discharge Summaries are split into various sections and written under a variety of headings, relating to admission, diagnosis and relevant discharge information. But the provided Discharge summary will be missing the \"Discharge Instructions\". \"Discharge Instructions\" is a section of the discharge summaries that summarizes key events of a patient's hospital stay, including the progression from admission to discharge. and provide detailed guidelines to patients (and often their caregivers) upon discharge from a hospital or healthcare facility, outlining how to care for themselves at home.
 You are tasked to generate the missing \"Discharge Instructions\" section in the discharge summary, based on the information of other sections in the discharge summary.
@@ -28,6 +28,3 @@ The summary should be written in the following structure, by answering some impo
         * Guidelines on any self-monitoring the patient should perform at home, such as weighing themselves, monitoring blood pressure, or blood sugar levels, with instructions on when to contact their healthcare provider.
         * Are there any specific symptoms or signs that the patient should monitor for which would require immediate medical attention? Under what circumstances should the patient immediately contact their healthcare provider or seek emergency care?
 6. Closing Remarks: A closing statement wishing the patient well and reinforcing the availability of the healthcare team for any questions or concerns post-discharge.
-
-Discharge summary:
-\"\"\"%s\"\"\" [/INST]
