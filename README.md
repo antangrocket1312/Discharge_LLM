@@ -32,7 +32,16 @@ conda install pytorch::pytorch torchvision torchaudio -c pytorch
 For other versions, please visit: [https://pytorch.org/get-started/locally/](https://pytorch.org/get-started/locally/)
 
 ### 3. Additional packages
-We need some additional packages to run the code. The list of packages is listed in ```requirements.txt```. On the main directory of the repository, run:
+You will need to install AutoGPTQ by following installation instructions described on the AutoGPTQ repo: https://github.com/AutoGPTQ/AutoGPTQ.
+
+You will need to install FastChat from source:
+```bash
+cd FastChat
+pip3 install --upgrade pip  # enable PEP 660 support
+pip3 install -e ".[model_worker,webui]"
+```
+
+You also need some additional packages to run the code. The list of packages is listed in ```requirements.txt```. On the main directory of the repository, run:
 ```bash
 pip install -r requirements.txt
 ```
