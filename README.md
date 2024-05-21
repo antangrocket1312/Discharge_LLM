@@ -56,7 +56,7 @@ Discharge-LLM applies three steps for generating Brief Hospital Course and Disch
 - **Stage 2: Radiology Report Selection**
 - **Stage 3: Target Section Generation**
 
-All prompts are located under [```/prompts```](/prompts)
+All prompts are located under [```/prompt```](/prompt)
 
 ## Inference
 We offer two options to perform inference of our pipeline framework (PAKPA), using Jupyter Notebook files (```notebook```) or Python inference scripts (```script```).
