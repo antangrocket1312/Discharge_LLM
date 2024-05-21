@@ -3,6 +3,9 @@
 *.zip
 /README_Ref.md
 *Full.ipynb
+/data/*/*.pkl
+brief_hospital_course_generation.py
+discharge_instructions_generation.py
 
 __pycache__/
 *.py[cod]

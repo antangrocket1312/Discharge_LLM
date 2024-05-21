@@ -1,25 +1,10 @@
-import os
 import sys
+import argparse
+import os
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 from utils.prompting import *
-from datasets import concatenate_datasets, load_dataset
-from datasets import Dataset, DatasetDict
-import pandas as pd
-import numpy as np
-import torch
-import os
-import ast
-import spacy
-from utils.prompting import *
-# pd.set_option('display.max_colwidth', None)
-import time
-from multiprocessing import Pool
-from tqdm import tqdm
-from os import listdir
-import openai
-import os
-import warnings
-warnings.filterwarnings("ignore")
+from pandarallel import pandarallel
+pandarallel.initialize(progress_bar=True)
 
 
 def replace_pertinent_results_with_radiology(row):
@@ -38,9 +23,32 @@ def replace_pertinent_results_with_radiology(row):
                 new_pertinent_results += report
             elif len(new_pertinent_results.split(" ")) < 1000:
                 new_pertinent_results += ("=============\n\n" + report)
-        #         new_pertinent_results = "=============\n\n".join([report for report in new_reports])
         new_pertinent_results += "=============\n\n"
 
-        row['processed_text'] = row['processed_text'].replace(row['Pertinent_Results'], new_pertinent_results)
+        row['text'] = row['text'].replace(row['Pertinent_Results'], new_pertinent_results)
 
     return row
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default='sample',
+                        help="The directory containing discharge summary and radiology input")
+    parser.add_argument("--section_extracted_input", type=str, default='discharge_extracted.pkl',
+                        help="The name of the discharge summary file with all sections extracted")
+    parser.add_argument("--output_file_name", type=str, default='discharge_processed.pkl',
+                        help="The name of the output file to be saved")
+
+    args = parser.parse_args()
+
+    dataset = args.dataset
+    data_path = f"./data/{dataset}/"
+
+    # Load Dataset
+    df = pd.read_pickle(os.path.join(data_path, args.section_extracted_input))
+
+    # Radiology Report Selection
+    df = df.parallel_apply(replace_pertinent_results_with_radiology, axis=1)
+
+    # Export file
+    df.to_pickle(os.path.join(data_path, args.output_file_name))

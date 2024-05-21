@@ -78,12 +78,16 @@ script
 ├── target_section_generation.py
 ```
 
-**Note:** *We provide full examples for inference on phase 2's test set (10962 samples) of the shared task (```data/test_phase_2```), but the runtime can be extremely long (6-7 days using GPU).
-For your convenience, we already completed the inference and provided the inference results as ```brief_hospital_course.csv``` and ```discharge_instructions.csv``` under (```data/test_phase_2```)*
+After each inference stage, output files are saved in the respective dataset folder.
+Files containing the final output of generated target sections are saved as ```brief_hospital_course.csv``` and ```discharge_instructions.csv```
 
-For runtime feasibility, we advised you can perform inference using data from (```data/sample```), a subset with 10 samples from the phase 2's test set.
+
+**Note:** *We provide full input examples for inference on phase 2's test set (10962 samples) of the shared task (```data/test_phase_2```), but the runtime can be extremely long (6-7 days using GPU).
+For your convenience, we already completed the inference and provided the final output as ```brief_hospital_course.csv``` and ```discharge_instructions.csv``` under (```data/test_phase_2```)*
+
+*For runtime feasibility, we advised you can perform inference using data from (```data/sample```), a subset with 10 samples from the phase 2's test set.
 You can also test the framework on their custom data, 
-with the discharge summary and radiology information following the exact schema and naming as defined in ```discharge.csv.gz``` and ```radiology.csv.gz```
+with the discharge summary and radiology information following the exact schema and naming as defined in ```discharge.csv.gz``` and ```radiology.csv.gz```*
 
 ### Hosting an instruction-finetuned Mistral LLM for Target Section Generation
 We used [FastChat](https://github.com/lm-sys/FastChat/tree/main) to host a Mistral LLMs for prompted generation of the two critical target sections of discharge summaries.
@@ -136,22 +140,19 @@ python3 -m fastchat.serve.openai_api_server --host localhost --port 8000
 
 ### Stage 1: Section Extraction
 ```bash
-python scripts/section_extraction.py \ 
-    --discharge_summary_path raw/phase_2/discharge.csv.gz \
-    --output_file_name raw/phase_2/discharge_extracted.csv.gz
+python script/section_extraction.py \
+    --dataset {`test_phase_2` or `sample`}
 ```
 
 ### Stage 2: Radiology Report Selection
 ```bash
-python scripts/section_extraction.py \ 
-    --extracted_discharge_summary_path raw/phase_2/discharge_extracted.csv.gz
-    --radiology_report raw/phase_2/radiology.csv.gz
-    --output_file_name raw/phase_2/discharge_processed.csv.gz
+python script/radiology_report_selection.py \ 
+    --dataset {`test_phase_2` or `sample`}
 ```
 
 ### Stage 3: Target Section Generation
 ```bash
-python scripts/section_extraction.py \ 
-    --processed_discharge_summary_path raw/phase_2/discharge_processed.csv.gz
-    --output_file_name raw/phase_2/discharge_target_generated.csv.gz
+python script/target_section_generation.py \
+    --target_section {`brief_hospital_course` or `discharge_instructions`} \
+    --dataset {`test_phase_2` or `sample`}
 ```

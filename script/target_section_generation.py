@@ -1,17 +1,8 @@
 import os
+import argparse
 import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 from utils.prompting import *
-from datasets import concatenate_datasets, load_dataset
-from datasets import Dataset, DatasetDict
-import pandas as pd
-import numpy as np
-import torch
-import os
-import ast
-import spacy
-from utils.prompting import *
-# pd.set_option('display.max_colwidth', None)
 import time
 from multiprocessing import Pool
 from tqdm import tqdm
@@ -19,7 +10,10 @@ from os import listdir
 import openai
 import os
 import warnings
+from pandarallel import pandarallel
+pandarallel.initialize(progress_bar=True)
 warnings.filterwarnings("ignore")
+
 
 def generate_target_section(target_section, data):
     if target_section == 'brief_hospital_course':
@@ -56,10 +50,6 @@ def generate_target_section(target_section, data):
 
 
 def target_section_summarization(root_path, target_section, domain, domain_df, save_step=10):
-    if target_section not in ['brief_hospital_course', 'discharge_instructions']:
-        raise ValueError('Invalid Target Section. Must either be: \'brief_hospital_course\' or '
-                         '\'discharge_instructions\'')
-
     src_path = f"{root_path}/{domain}"
     Path(src_path).mkdir(parents=True, exist_ok=True)
     extractions = []
@@ -163,3 +153,133 @@ def post_process_discharge_instructions(row):
     text = re.sub(r'(?i)(sincerely,[\n ]+your.+team.*)[\n ]+([^\n]+\n*)+$', r'\1', text, re.DOTALL)
 
     return text
+
+
+def remove_output_from_input(row):
+    if 'brief_hospital_course' in row:
+        # Use Generated Brief Hospital Course for subsequent generation of Discharge Instructions
+        # if 'Brief Hospital Course' in row['text']:
+        if pd.notnull(row['Brief_Hospital_Course']):
+            row['new_text'] = row['text'].replace(row['Brief_Hospital_Course'], row['brief_hospital_course'])
+        else:
+            row['new_text'] = row['text'] + "\n\nBrief Hospital Course:\n" + row['brief_hospital_course']
+    else:
+        row['new_text'] = row['text'].replace(row['Brief_Hospital_Course'], '')
+        row['new_text'] = re.sub(r'Brief Hospital Course:\n*', r'', row['new_text'], flags=re.DOTALL)
+
+    row['new_text'] = row['new_text'].replace(row['Discharge_Instructions'], '')
+    row['new_text'] = re.sub(r'Discharge Instructions:\n*', r'', row['new_text'], flags=re.DOTALL)
+
+    row['new_text'] = re.sub(r'(\n ?)+(Followup Instructions)', r'\n\n\n\2', row['new_text'], flags=re.DOTALL)
+
+    return row
+
+
+field = ['Brief_Hospital_Course', 'Discharge_Instructions', 'Physical_Exam', 'Pertinent_Results']
+
+
+def calculate_word_count(row):
+    discharge_sections = []
+    for col in field:
+        word_count = 0
+        if pd.notnull(row[col]):
+            word_count = len(row[col].split(" "))
+        else:
+            word_count = 0
+        row[col + "_Word_Count"] = word_count
+
+    return row
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default='sample',
+                        help="The directory containing discharge summary and radiology input")
+    parser.add_argument("--target_section", type=str, required=True,
+                        choices={"brief_hospital_course", "discharge_instructions"},
+                        help="The target section of the discharge summary to be generated. Must either be "
+                             "\"brief_hospital_course\" or \"discharge_instructions\"")
+    parser.add_argument("--processed_input", type=str, default='discharge_processed.pkl',
+                        help="The name of the discharge summary file with all sections extracted and selected for "
+                             "good radiology information")
+    parser.add_argument("--num_workers", type=int, default=3, help="The number of workers for the ABSA task")
+
+    args = parser.parse_args()
+
+    dataset = args.dataset
+    data_path = f"./data/{dataset}/"
+
+    target_section = args.target_section
+    num_workers = args.num_workers
+
+    # Load Dataset
+    df = pd.read_pickle(os.path.join(data_path, args.processed_input))
+
+    if target_section == 'discharge_instructions':
+        if os.path.isfile(f"./data/{dataset}/brief_hospital_course.csv"):
+            # Read generated Brief Hospital Course
+            brief_hospital_course_df = pd.read_csv(f"./data/{dataset}/brief_hospital_course.csv")
+            df = df.merge(brief_hospital_course_df, on=['hadm_id'])
+        else:
+            raise FileNotFoundError("\"brief_hospital_course\" must be generated before generating discharge "
+                                    "instructions")
+
+    # Pre-processing
+    df = df.apply(remove_output_from_input, axis=1)
+    df = df.rename(columns={'new_text': 'processed_text'})
+    df = df.apply(calculate_word_count, axis=1)
+    df['processed_text_word_count'] = df['processed_text'].apply(lambda x: len(x.split(" ")))
+    df = df.sort_values(by=['processed_text_word_count'], ascending=False)
+
+    # Partition
+    thres = 1000
+    df['category'] = df['processed_text_word_count'].apply(lambda x: 1 if x < thres else 0)
+    mask = (df['processed_text_word_count'] >= 1000) & (df['processed_text_word_count'] <= 1300)
+    df.loc[mask, 'category'] = 2
+
+    root_path = f'./data/{dataset}/{target_section}_cache/'
+
+    inputs = [(root_path,
+               target_section,
+               domain,
+               df[df['category'] == domain].reset_index(drop=True),
+               100,
+               )
+              for domain in [0, 1, 2]]
+    start_time = time.time()
+    with Pool(num_workers) as processor:
+        data = processor.starmap(target_section_summarization, inputs)
+
+    processed_df = pd.concat(data).drop_duplicates(['hadm_id'])
+    df = df.merge(processed_df, on=['hadm_id'])
+
+    # Post-processing
+    if target_section == 'brief_hospital_course':
+        mask = df['brief_hospital_course'].apply(lambda x: len(re.findall(r'(\#[^\n]+\n){8,}', x)) > 0)
+        df.loc[mask, 'brief_hospital_course'] = df[mask].apply(fix_hallucination, axis=1)
+
+        df['brief_hospital_course'] = df['brief_hospital_course'].apply(remove_repitition)
+        df['brief_hospital_course'] = df['brief_hospital_course'].apply(lambda x: "\n\n".join(x.split("\n\n")[0:3]))
+        df['brief_hospital_course'] = df['brief_hospital_course'].apply(
+            lambda text: re.sub(r'([A-Za-z0-9,._][ \s])\n([A-Za-z0-9])', r'\1\2', text))
+        df['brief_hospital_course'] = df['brief_hospital_course'].apply(remove_sent_repitition)
+
+        mask = pd.notnull(df['brief_hospital_course'])
+        df.loc[mask, 'brief_hospital_course'] = df[mask].parallel_apply(post_process_brief_hospital_course, axis=1)
+
+        df = df.drop_duplicates(subset=['hadm_id'])
+
+        df[['hadm_id', 'brief_hospital_course']].to_csv(f"./data/{dataset}/brief_hospital_course.csv", index=False)
+    elif target_section == 'discharge_instructions':
+        df['discharge_instructions'] = df['discharge_instructions'].apply(remove_repitition)
+        df['discharge_instructions'] = df['discharge_instructions'].apply(
+            lambda text: re.sub(r'([A-Za-z0-9,._][ \s])\n([A-Za-z0-9])', r'\1\2', text))
+        df['discharge_instructions'] = df['discharge_instructions'].apply(remove_sent_repitition)
+
+        mask = pd.notnull(df['discharge_instructions'])
+        df.loc[mask, 'discharge_instructions'] = df[mask].parallel_apply(post_process_discharge_instructions, axis=1)
+
+        df = df.drop_duplicates(subset=['hadm_id'])
+
+        df[['hadm_id', 'discharge_instructions']].to_csv(f"./data/{dataset}/discharge_instructions.csv", index=False)
+
