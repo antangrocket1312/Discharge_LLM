@@ -84,10 +84,10 @@ After each inference stage, output files are saved in the respective dataset fol
 Files containing the final output of generated target sections are saved as ```brief_hospital_course.csv``` and ```discharge_instructions.csv```
 
 
-**Note:** *We provide full input examples for inference on phase 2's test set (10962 samples) of the shared task [```/data/test_phase_2```](```/data/test_phase_2```), but the runtime can be extremely long (6-7 days using GPU).
+**Note:** *We provide full input examples for inference on phase 2's test set (10962 samples) of the shared task [```/data/test_phase_2```](/data/test_phase_2), but the runtime can be extremely long (6-7 days using GPU).
 For your convenience, we already completed the inference and provided the final output as ```brief_hospital_course.csv``` and ```discharge_instructions.csv``` under (```data/test_phase_2```)*
 
-*For runtime feasibility, we advised you can perform inference using data from [```/data/sample```](```/data/sample```), a subset with 10 samples from the phase 2's test set.
+*For runtime feasibility, we advised you can perform inference using data from [```/data/sample```](/data/sample), a subset with 10 samples from the phase 2's test set.
 You can also test the framework on their custom data, 
 with the discharge summary and radiology information following the exact schema and naming as defined in ```discharge.csv.gz``` and ```radiology.csv.gz```*
 
