@@ -11,7 +11,7 @@ def replace_pertinent_results_with_radiology(row):
     if pd.notnull(row['Pertinent_Results']):
         new_reports = []
         for report in row['radiology_text']:
-            rex = r'((?i)impression:[\s ]*\n{0,2}(.+?)\s*$)'
+            rex = r'(?i)(impression:[\s ]*\n{0,2}(.+?)\s*$)'
             section_ext = re.findall(rex, report, re.DOTALL)
             if len(section_ext) > 0 and section_ext[0][1][:15] in row['Pertinent_Results']:
                 new_reports += [report]
